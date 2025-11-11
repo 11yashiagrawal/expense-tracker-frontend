@@ -12,7 +12,6 @@ export default function Home() {
           borderWidth: "1px solid",
           borderColor: "#14a248",
         }}
-        onClick={handleLogin}
       >
         Login
       </Button>
@@ -21,7 +20,6 @@ export default function Home() {
           bgcolor: "#14a248", 
           color: "#07130a" 
         }}
-        onClick={handleLogin}
       >
         Register
       </Button>
