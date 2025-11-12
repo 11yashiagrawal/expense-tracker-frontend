@@ -1,4 +1,7 @@
+"use client"
 import { Geist, Geist_Mono } from "next/font/google";
+import { ThemeProvider, CssBaseline } from "@mui/material";
+import theme from "@/lib/theme";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -11,10 +14,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  title: "Trackify",
-  description: "Expense Tracker and subscription manager",
-};
+// export const metadata = {
+//   title: "Trackify",
+//   description: "Expense Tracker and subscription manager",
+// };
 
 export default function RootLayout({ children }) {
   return (
@@ -22,7 +25,10 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+       <ThemeProvider theme={theme}>
+          <CssBaseline />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
