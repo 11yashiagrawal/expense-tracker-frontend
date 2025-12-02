@@ -1,36 +1,135 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+Trackify – Manage Your Expenses & Subscriptions
 
-## Getting Started
+Trackify is a full-stack web application designed to help users effortlessly manage their daily expenses and monthly subscription payments. It allows users to record, view, update, and analyze their spending patterns while also tracking upcoming subscription renewals.
 
-First, run the development server:
+📌 Problem Statement
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Managing expenses and recurring subscriptions manually can be time-consuming and error-prone. People often lose track of weekly spending, struggle to maintain a budget, and forget upcoming due payments.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Trackify solves this by providing a centralized platform where users can:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Log expenses and subscriptions
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+View spending analytics
 
-## Learn More
+Track monthly budgets
 
-To learn more about Next.js, take a look at the following resources:
+Search, sort, filter, and paginate through transactions
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Analyze trends with clean visualizations
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+🧱 System Architecture
+Frontend → Backend (REST API) → Database
 
-## Deploy on Vercel
+Frontend
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Next.js (Pages Router)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+TailwindCSS, Material UI
+
+Axios for API communication
+
+Backend
+
+Node.js + Express
+
+JWT-based authentication
+
+REST API architecture
+
+Database
+
+MongoDB (MongoDB Atlas)
+
+Hosting
+
+Frontend → Vercel
+
+Backend → Railway
+
+Database → MongoDB Atlas
+
+🚀 Key Features
+🔐 Authentication & Authorization
+
+User Registration
+
+Login & Logout
+
+Access + Refresh tokens (JWT)
+
+Secure password update
+
+📝 CRUD Operations
+
+Create, Read, Update, Delete:
+
+Expenses
+
+Subscriptions
+
+Payments
+
+📍 Frontend Routing (Next.js App Router)
+
+Dashboard
+
+Login / Logout
+
+Landing Page
+
+Profile
+
+Expenses
+
+Subscriptions
+(All pages fetch data dynamically via APIs)
+
+🔍 Easy Data Viewing
+
+Search expenses, transactions, subscriptions
+
+Sort by amount (low → high, high → low)
+
+Filter by category, type, or date
+
+Pagination to prevent UI clutter
+
+📊 Monitor Expenses
+
+Monthly expense summaries
+
+Category-wise expenditure
+
+Charts for spending insights
+
+☁️ Hosting
+
+Fully deployed frontend + backend
+
+Accessible and secure APIs
+
+🛠️ Tech Stack
+Layer	Technologies
+Frontend	Next.js, Axios, TailwindCSS, Material UI
+Backend	Node.js, Express.js
+Database	MongoDB
+Auth	JWT (Access + Refresh tokens)
+Hosting	Vercel, Render
+📡 API Overview
+Endpoint	Method	Description	Access
+/users/register	POST	Register new user	Public
+/users/login	POST	Login user	Public
+/users/changePassword	POST	Update password	Authenticated
+/expenses	GET	Get all expenses	Authenticated
+/expenses	POST	Add a new expense	Authenticated
+/expenses/:id	PATCH	Update expense by ID	Authenticated
+/expenses/:id	DELETE	Delete expense by ID	Authenticated
+
+
+Create .env with:
+
+MONGO_URI=your_mongodb_uri
+ACCESS_TOKEN_SECRET=your_access_secret
+REFRESH_TOKEN_SECRET=your_refresh_secret
+PORT=5000

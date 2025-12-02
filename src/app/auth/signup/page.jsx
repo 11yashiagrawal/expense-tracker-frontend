@@ -1,6 +1,8 @@
 "use client"
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import { signupUser } from "@/services/auth";
 import AuthForm from "@/components/forms/auth";
 
@@ -17,6 +19,14 @@ const signupFields = [
 
 export default function Signup(){
     const router = useRouter();
+    const { isAuthenticated, isLoading } = useAuth();
+
+    // Redirect authenticated users away from signup page
+    useEffect(() => {
+        if (!isLoading && isAuthenticated) {
+            router.replace("/dashboard");
+        }
+    }, [isAuthenticated, isLoading, router]);
 
   const handleSignup = async (formData) => {
     if (formData.password !== formData.confirmPassword) {
@@ -26,12 +36,29 @@ export default function Signup(){
 
     try {
       const res = await signupUser(formData);
-      if (res?.success) router.push("/dashboard");
-      else alert(res?.message || "Signup failed");
+      if (res?.success) {
+        // Set fresh login session flag after successful signup
+        sessionStorage.setItem("freshLogin", "true");
+        // Store auth token if provided
+        if (res?.token) {
+          localStorage.setItem("authToken", res.token);
+        } else {
+          localStorage.setItem("authToken", "authenticated");
+        }
+        if (res?.user) {
+          localStorage.setItem("user", JSON.stringify(res.user));
+        }
+        router.push("/dashboard");
+      } else alert(res?.message || "Signup failed");
     } catch (err) {
       alert(err.response?.data?.message);
     }
   };
+
+  // Don't render signup form if user is authenticated
+  if (isLoading || isAuthenticated) {
+    return null;
+  }
 
   return (
     <AuthForm
