@@ -6,17 +6,21 @@ import {
   CreditCard as CreditCardIcon,
   AccountBalanceWallet as WalletIcon,
 } from "@mui/icons-material";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import TrendingDownIcon from "@mui/icons-material/TrendingDown";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import { formatCurrency } from "@/utils/formatUtils";
+import SpendingAnalysis from "./SpendingAnalysis";
 
 const StatCard = ({ title, amount, icon: Icon, color }) => (
   <Paper
     sx={{
-      p: 3,
+      p: 2.5,
       bgcolor: "#000",
       borderRadius: 6,
       display: "flex",
       flexDirection: "column",
-      gap: 1,
+      // gap: 1,
       flex: 1,
       minWidth: 200,
     }}
@@ -37,7 +41,7 @@ const StatCard = ({ title, amount, icon: Icon, color }) => (
         <Icon fontSize="small" />
       </Box>
     </Box>
-    <Typography variant="h4" sx={{ fontWeight: 700, color: "#fff" }}>
+    <Typography variant="h5" sx={{ fontWeight: 700, color: "#fff" }}>
       {formatCurrency(amount)}
     </Typography>
   </Paper>
@@ -64,7 +68,7 @@ const BudgetDetails = ({ category }) => {
   return (
     <Box sx={{ flex: 1, p: 2 }}>
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 700, mb: 0.5 }}>
+        <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
           {categoryName}
         </Typography>
         <Typography variant="body1" sx={{ color: "#9CA3AF" }}>
@@ -100,7 +104,7 @@ const BudgetDetails = ({ category }) => {
           borderRadius: 7,
         }}
       >
-        <Typography variant="h6" sx={{ mb: 4, fontWeight: 600 }}>
+        <Typography variant="body1" sx={{ mb: 4, fontWeight: 600 }}>
           Budget Utilization
         </Typography>
 
@@ -117,26 +121,29 @@ const BudgetDetails = ({ category }) => {
           variant="determinate"
           value={Math.min(percentage, 100)}
           sx={{
-            height: 12,
+            height: 8,
             borderRadius: 6,
             bgcolor: "rgba(255, 255, 255, 0.1)",
             mb: 2,
             "& .MuiLinearProgress-bar": {
-              bgcolor: "#F59E0B", // Using the orange/yellow color from the image description
+              bgcolor: theme.palette.warning.main,
               borderRadius: 6,
             },
           }}
         />
 
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Typography variant="body2" sx={{ color: "#F59E0B", fontWeight: 600 }}>
+          <Typography variant="body2" sx={{ color: theme.palette.warning.main, fontWeight: 600 }}>
             {Math.round(percentage)}% of budget used
           </Typography>
-          <Typography variant="body2" sx={{ color: "#9CA3AF" }}>
+          <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
             {formatCurrency(remaining)} remaining
           </Typography>
         </Box>
       </Paper>
+
+      {/* Spending Analysis Chart */}
+      <SpendingAnalysis category={category} />
     </Box>
   );
 };

@@ -48,7 +48,7 @@ export default function AuthForm({ fields, title, buttonText, onSubmit }) {
         </Typography>
         {fields.map((field) => (
           <div key={field.name}>
-            <Typography variant="subtitle2" sx={{marginBottom: 0}}>{field.label}</Typography>
+            <Typography variant="subtitle2" sx={{marginBottom: 1}}>{field.label}</Typography>
             <TextField
               // label={field.label}
               name={field.name}

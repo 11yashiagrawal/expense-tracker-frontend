@@ -88,20 +88,9 @@ const MuiTextField = {
         },
       },
 
-      // ✅ LABEL styling — contrastText only
+      // ✅ LABEL styling — HIDING IT (handled externally)
       "& .MuiInputLabel-root": {
-        color: theme.palette.primary.contrastText,
-        margin: "2px 0px 4px 2px",
-        transition: "all 0.2s ease",
-      },
-      "& .MuiInputLabel-root.Mui-disabled": {
-        color: theme.palette.text.disabled,
-      },
-      "& .MuiInputLabel-root.Mui-focused": {
-        color: theme.palette.primary.contrastText,
-      },
-      "& .MuiInputLabel-root.Mui-error": {
-        color: theme.palette.error.main,
+        display: "none",
       },
 
       // ✅ Helper text styling
@@ -114,6 +103,9 @@ const MuiTextField = {
         color: theme.palette.error.main,
       },
     }),
+  },
+  defaultProps: {
+    hiddenLabel: true,
   },
 };
 

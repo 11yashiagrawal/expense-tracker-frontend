@@ -99,10 +99,11 @@ export default function Header() {
           <IconButton 
             onClick={handleLogout}
             sx={{ 
-              color: theme.palette.text.secondary,
+              color: theme.palette.text.primary,
+              borderColor: "transparent",
               "&:hover": {
                 color: theme.palette.error.main,
-                bgcolor: "rgba(239, 68, 68, 0.1)"
+                bgcolor: theme.palette.error.dark
               }
             }}
           >

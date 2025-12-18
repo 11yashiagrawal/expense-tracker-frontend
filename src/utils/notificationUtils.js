@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Snackbar, Alert } from "@mui/material";
 
 let showNotificationCallback = null;
@@ -10,20 +10,20 @@ export const useNotification = () => {
         severity: "success", // 'success' | 'error' | 'warning' | 'info'
     });
 
-    const showNotification = (message, severity = "success") => {
+    const showNotification = useCallback((message, severity = "success") => {
         setNotification({
             open: true,
             message,
             severity,
         });
-    };
+    }, []);
 
-    const handleClose = (event, reason) => {
+    const handleClose = useCallback((event, reason) => {
         if (reason === "clickaway") {
             return;
         }
-        setNotification({ ...notification, open: false });
-    };
+        setNotification((prev) => ({ ...prev, open: false }));
+    }, []);
 
     const NotificationComponent = () => (
         <Snackbar

@@ -4,6 +4,8 @@ import { ThemeProvider, CssBaseline } from "@mui/material";
 import theme from "@/lib/theme";
 import { AuthProvider } from "@/context/AuthContext";
 import NavigationGuard from "@/components/auth/NavigationGuard";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,13 +29,15 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-       <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <AuthProvider>
-            <NavigationGuard>
-              {children}
-            </NavigationGuard>
-          </AuthProvider>
+        <ThemeProvider theme={theme}>
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <CssBaseline />
+            <AuthProvider>
+              <NavigationGuard>
+                {children}
+              </NavigationGuard>
+            </AuthProvider>
+          </LocalizationProvider>
         </ThemeProvider>
       </body>
     </html>

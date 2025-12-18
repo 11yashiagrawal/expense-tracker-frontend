@@ -63,11 +63,11 @@ export default function StatCards() {
             lastMonthDates.end
           ),
         ]);
-        console.log(userResponse);
-        console.log(currentIncomeResponse);
-        console.log(lastMonthIncomeResponse);
-        console.log(currentExpensesResponse);
-        console.log(lastMonthExpensesResponse);
+        // console.log(userResponse);
+        // console.log(currentIncomeResponse);
+        // console.log(lastMonthIncomeResponse);
+        // console.log(currentExpensesResponse);
+        // console.log(lastMonthExpensesResponse);
         // Set current balance from user data
         if (userResponse?.data?.balance !== undefined) {
           setCurrentBalance(userResponse.data.balance);

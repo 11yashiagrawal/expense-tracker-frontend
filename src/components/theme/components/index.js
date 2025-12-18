@@ -1,13 +1,17 @@
 import MuiButton from "./MuiButton";
+import MuiIconButton from "./MuiIconButton";
 import MuiTextField from "./MuiTextField";
 import MuiBox from "./MuiBox";
-import MuiIconButton from "./MuiIconButton";
+import MuiSelectTheme from "./MuiSelect";
+import MuiToggleButtonTheme from "./MuiToggleButton";
 
 const components = {
     MuiButton,
+    MuiIconButton,
     MuiTextField,
     MuiBox,
-    MuiIconButton,
-}
+    ...MuiSelectTheme,
+    ...MuiToggleButtonTheme,
+};
 
 export default components;

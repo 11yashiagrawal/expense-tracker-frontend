@@ -93,34 +93,40 @@ const AddCategoryForm = ({ onSuccess, onCancel }) => {
   return (
     <form onSubmit={handleSubmit}>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, pt: 1 }}>
-        <TextField
-          label="Title"
-          fullWidth
-          value={formData.title}
-          onChange={(e) => handleChange("title", e.target.value)}
-          error={!!errors.title}
-          helperText={errors.title}
-          disabled={loading}
-          placeholder="e.g., Food & Dining"
-        />
-
-        <TextField
-          label="Budget"
-          fullWidth
-          type="number"
-          value={formData.budget}
-          onChange={(e) => handleChange("budget", e.target.value)}
-          error={!!errors.budget}
-          helperText={errors.budget}
-          disabled={loading}
-          placeholder="0"
-          inputProps={{
-            min: 0,
-          }}
-        />
+        <Box>
+          <Typography variant="subtitle2" sx={{ mb: 1 }}>Title</Typography>
+          <TextField
+            // label="Title"
+            fullWidth
+            value={formData.title}
+            onChange={(e) => handleChange("title", e.target.value)}
+            error={!!errors.title}
+            helperText={errors.title}
+            disabled={loading}
+            placeholder="e.g., Food & Dining"
+          />
+        </Box>
 
         <Box>
-          <Typography variant="caption" sx={{ color: theme.palette.text.secondary, mb: 1, display: 'block' }}>
+          <Typography variant="subtitle2" sx={{ mb: 1 }}>Budget</Typography>
+          <TextField
+            // label="Budget"
+            fullWidth
+            type="number"
+            value={formData.budget}
+            onChange={(e) => handleChange("budget", e.target.value)}
+            error={!!errors.budget}
+            helperText={errors.budget}
+            disabled={loading}
+            placeholder="0"
+            inputProps={{
+              min: 0,
+            }}
+          />
+        </Box>
+
+        <Box>
+          <Typography variant="subtitle2" sx={{ mb: 1 }}>
             Colour
           </Typography>
           <TextField

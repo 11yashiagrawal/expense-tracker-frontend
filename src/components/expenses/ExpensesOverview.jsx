@@ -70,7 +70,7 @@ const ExpensesOverview = ({ selectedDate }) => {
             {
               label: "Expenses",
               data: expensesData,
-              borderColor: "#EF4444",
+              borderColor: theme.palette.error.main,
               backgroundColor: (context) => {
                 const ctx = context.chart.ctx;
                 const gradient = ctx.createLinearGradient(0, 0, 0, 300);
@@ -82,11 +82,11 @@ const ExpensesOverview = ({ selectedDate }) => {
               tension: 0.4,
               pointRadius: 4,
               pointHoverRadius: 6,
-              pointBackgroundColor: "#EF4444",
-              pointBorderColor: "#fff",
+              pointBackgroundColor: "#000",
+              pointBorderColor: theme.palette.error.main,
               pointBorderWidth: 2,
-              pointHoverBackgroundColor: "#EF4444",
-              pointHoverBorderColor: "#fff",
+              pointHoverBackgroundColor: theme.palette.error.main,
+              pointHoverBorderColor: theme.palette.error.main,
               pointHoverBorderWidth: 2,
             },
           ],
@@ -110,9 +110,9 @@ const ExpensesOverview = ({ selectedDate }) => {
       },
       tooltip: {
         enabled: true,
-        backgroundColor: "rgba(0, 0, 0, 0.9)",
+        backgroundColor: "#000",
         titleColor: "#9CA3AF",
-        bodyColor: "#EF4444",
+        bodyColor: theme.palette.error.main,
         padding: 16,
         cornerRadius: 8,
         displayColors: false,

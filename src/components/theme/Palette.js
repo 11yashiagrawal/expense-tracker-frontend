@@ -7,14 +7,14 @@ const Palette = {
     brightText: "#139f46",
   },
   error: {
-    main: "#dc2627",
+    main: "rgba(220, 38, 39, 1)",
     light: "#e05252",
     dark: "#180707",
     contrastText: "#ffffff",
   },
   warning: {
-    main: "#d19f09",
-    light: "#fbbf23",
+    main: "#F59E0B",
+    light: "#d19f09",
     dark: "#181201",
     contrastText: "#ffffff",
   },
@@ -32,7 +32,7 @@ const Palette = {
   },
   text: {
     primary: "#ffffff",
-    secondary: "#FFFFFFB3",
+    secondary: "#9CA3AF",
     disabled: "#FFFFFF80",
     icon: "#FFFFFF80",
   },

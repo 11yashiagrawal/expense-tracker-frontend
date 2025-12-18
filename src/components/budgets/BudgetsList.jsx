@@ -6,7 +6,7 @@ import { Add as AddIcon, ChevronRight as ChevronRightIcon } from "@mui/icons-mat
 import { formatCurrency } from "@/utils/formatUtils";
 import AddCategoryDialog from "./AddCategoryDialog";
 import { useNotification } from "@/utils/notificationUtils";
-import * as Icons from "@mui/icons-material";
+import { getIcon } from "@/utils/getCategoryIcon";
 
 const BudgetsList = ({ categories, isLoading, onSelectCategory, selectedCategoryId, onRefresh }) => {
   const theme = useTheme();
@@ -20,20 +20,15 @@ const BudgetsList = ({ categories, isLoading, onSelectCategory, selectedCategory
     }
   };
 
-  const getIcon = (iconName) => {
-    const IconComponent = Icons[iconName] || Icons.Category;
-    return <IconComponent sx={{ color: "#fff", fontSize: 20 }} />;
-  };
-
   if (isLoading) return <Typography>Loading...</Typography>;
 
   return (
     <Box sx={{ width: "100%", maxWidth: 400, display: "flex", flexDirection: "column", height: "100%" }}>
-      <Typography variant="h5" sx={{ mb: 3, fontWeight: 700 }}>
+      <Typography variant="h5" sx={{ mb: 3, fontWeight: 900 }}>
         Budgets
       </Typography>
 
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2, flex: 1, overflowY: "auto", pr: 1 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2, flex: 1, overflowY: "auto", pr: 1, scrollbarWidth: "none" }}>
         {categories.map((category) => {
           const percentage = category.budget > 0 ? (category.expenditure / category.budget) * 100 : 0;
           const isOverBudget = percentage > 75;
@@ -47,7 +42,7 @@ const BudgetsList = ({ categories, isLoading, onSelectCategory, selectedCategory
               elevation={isSelected ? 4 : 1}
               sx={{
                 p: 2.5,
-                bgcolor: isSelected ? "rgba(255, 255, 255, 0.05)" : "#000",
+                bgcolor: "#000",
                 color: "#fff",
                 borderRadius: 7,
                 cursor: "pointer",
@@ -60,8 +55,8 @@ const BudgetsList = ({ categories, isLoading, onSelectCategory, selectedCategory
                   <Avatar
                     sx={{
                       bgcolor: category.colour || theme.palette.primary.main,
-                      width: 48,
-                      height: 48,
+                      width: 32,
+                      height: 32,
                       borderRadius: 3,
                     }}
                   >
@@ -93,7 +88,7 @@ const BudgetsList = ({ categories, isLoading, onSelectCategory, selectedCategory
                 variant="determinate"
                 value={Math.min(percentage, 100)}
                 sx={{
-                  height: 8,
+                  height: 6,
                   borderRadius: 4,
                   bgcolor: "rgba(255, 255, 255, 0.1)",
                   "& .MuiLinearProgress-bar": {
@@ -126,11 +121,12 @@ const BudgetsList = ({ categories, isLoading, onSelectCategory, selectedCategory
           borderRadius: 7,
           borderStyle: "dashed",
           width: "100%",
-          color: theme.palette.text.secondary,
-          borderColor: theme.palette.divider,
+          height: "6%",
+          color: theme.palette.text.primary,
+          borderColor: theme.palette.primary.main,
           "&:hover": {
-            borderColor: theme.palette.text.primary,
-            bgcolor: "rgba(255, 255, 255, 0.05)",
+            borderColor: "transparent",
+            bgcolor: theme.palette.action.hover,
           },
         }}
       >
