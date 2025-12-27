@@ -61,15 +61,19 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try {
-      await logoutUser();
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
+      // Clear storage first for synchronous effect
       localStorage.removeItem("authToken");
       localStorage.removeItem("user");
       sessionStorage.removeItem("freshLogin");
       setUser(null);
+
+      // Redirect immediately to prevent further renders of protected components
       router.push("/");
+
+      // Silently call logout API in background
+      await logoutUser();
+    } catch (error) {
+      console.error("Logout error:", error);
     }
   };
 

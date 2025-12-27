@@ -162,6 +162,17 @@ const AddExpenseForm = ({ onSuccess, onCancel, initialData }) => {
             error={!!errors.date}
             helperText={errors.date}
           />
+          {/* <TextField
+            required
+            fullWidth
+            label="Date"
+            type="date"
+            value={formData.date}
+            onChange={(e) => handleChange("date", e.target.value)}
+            error={!!errors.date}
+            helperText={errors.date}
+            disabled={loading}
+          /> */}
         </Box>
 
         <Box>

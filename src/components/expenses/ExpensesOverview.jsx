@@ -17,6 +17,7 @@ import { Line } from "react-chartjs-2";
 import { getExpensesForDates } from "@/services/expenses";
 import { getMonthDates } from "@/utils/dateUtils";
 import { formatCurrency } from "@/utils/formatUtils";
+import Loading from "@/components/common/Loading";
 
 ChartJS.register(
   CategoryScale,
@@ -43,11 +44,11 @@ const ExpensesOverview = ({ selectedDate }) => {
         // Use selectedDate instead of new Date()
         const currentYear = selectedDate.getFullYear();
         const currentMonth = selectedDate.getMonth();
-        
+
         // Get past 12 months relative to selected date
         const months = [];
         const monthLabels = [];
-        
+
         for (let i = 11; i >= 0; i--) {
           const date = new Date(currentYear, currentMonth - i, 1);
           const monthName = date.toLocaleDateString("en-US", { month: "short" });
@@ -99,7 +100,7 @@ const ExpensesOverview = ({ selectedDate }) => {
     };
 
     fetchData();
-  }, [selectedDate.getFullYear()]); // Only re-run if year changes
+  }, [selectedDate.getMonth(), selectedDate.getFullYear()]); // Only re-run if year changes
 
   const options = {
     responsive: true,
@@ -175,11 +176,7 @@ const ExpensesOverview = ({ selectedDate }) => {
   };
 
   if (isLoading) {
-    return (
-      <Box sx={{ mt: 4, p: 3, bgcolor: theme.palette.background.paper, borderRadius: 3 }}>
-        <Typography>Loading...</Typography>
-      </Box>
-    );
+    return <Loading height="300px" sx={{ mt: 4, p: 3, bgcolor: theme.palette.background.paper, borderRadius: 3 }} />;
   }
 
   return (
@@ -188,8 +185,8 @@ const ExpensesOverview = ({ selectedDate }) => {
         mt: 4,
         p: 3,
         bgcolor: theme.palette.background.paper,
-        borderRadius: 3,
-        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: 4,
+        // border: `1px solid ${theme.palette.divider}`,
       }}
     >
       <Typography variant="h6" sx={{ fontWeight: 600, color: theme.palette.text.primary, mb: 3 }}>

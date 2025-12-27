@@ -3,14 +3,15 @@
 import { useState, useEffect } from "react";
 import { Box, Typography, useTheme, CircularProgress } from "@mui/material";
 import { getExpenditurePerCategory } from "@/services/expenses";
+import Loading from "@/components/common/Loading";
 
 import { getMonthDates } from "@/utils/dateUtils";
 import { darken } from "@/utils/formatUtils";
 
 const CircularProgressWithLabel = ({ value, color, label, size = 140 }) => {
   const theme = useTheme();
-  
-  
+
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
       <Box sx={{ position: 'relative', display: 'inline-flex' }}>
@@ -73,12 +74,12 @@ const Budgets = () => {
       try {
         const now = new Date();
         const { start, end } = getMonthDates(now.getFullYear(), now.getMonth());
-        
+
         const response = await getExpenditurePerCategory(start, end);
         // API response structure: { data: [...] }
         console.log(response, "from budgets")
         const data = response.data || [];
-        
+
         // Take first 4 items
         setBudgets(data.slice(0, 4));
       } catch (error) {
@@ -91,16 +92,16 @@ const Budgets = () => {
     fetchData();
   }, []);
 
-  if (isLoading) return <Typography>Loading...</Typography>;
+  if (isLoading) return <Loading height="180px" />;
 
   return (
     <Box sx={{ mt: 4, width: '100%' }}>
       <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, color: theme.palette.text.primary }}>
         Budgets
       </Typography>
-      
-      <Box sx={{ 
-        display: 'grid', 
+
+      <Box sx={{
+        display: 'grid',
         gridTemplateColumns: 'repeat(2, 1fr)',
         gap: 4,
         justifyItems: 'center'

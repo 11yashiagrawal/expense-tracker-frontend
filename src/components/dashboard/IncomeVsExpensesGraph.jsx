@@ -15,6 +15,7 @@ import { Bar } from "react-chartjs-2";
 import { getIncomeForDates } from "@/services/income";
 import { getExpensesForDates } from "@/services/expenses";
 import { getMonthDates } from "@/utils/dateUtils";
+import Loading from "@/components/common/Loading";
 
 ChartJS.register(
   CategoryScale,
@@ -109,16 +110,16 @@ const IncomeVsExpensesGraph = () => {
         callbacks: {
           title: () => "INCOME      EXPENSES", // Custom header
           label: (context) => {
-             // This is tricky to match exact design with single tooltip showing both values side by side
-             // Standard tooltip shows one line per dataset
-             let label = context.dataset.label || '';
-             if (label) {
-                 label += ': ';
-             }
-             if (context.parsed.y !== null) {
-                 label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'INR' }).format(context.parsed.y);
-             }
-             return label;
+            // This is tricky to match exact design with single tooltip showing both values side by side
+            // Standard tooltip shows one line per dataset
+            let label = context.dataset.label || '';
+            if (label) {
+              label += ': ';
+            }
+            if (context.parsed.y !== null) {
+              label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'INR' }).format(context.parsed.y);
+            }
+            return label;
           }
         }
       },
@@ -144,17 +145,17 @@ const IncomeVsExpensesGraph = () => {
           callback: (value) => value, // Simplify ticks
         },
         border: {
-            display: false
+          display: false
         }
       },
     },
     interaction: {
-        mode: 'index',
-        intersect: false,
+      mode: 'index',
+      intersect: false,
     },
   };
 
-  if (isLoading) return <Typography>Loading...</Typography>;
+  if (isLoading) return <Loading height="350px" sx={{ mt: 4, bgcolor: "#000", borderRadius: 4 }} />;
 
   return (
     <Box sx={{ mt: 4, width: "100%", height: 350, p: 3, bgcolor: "#000", borderRadius: 4 }}>

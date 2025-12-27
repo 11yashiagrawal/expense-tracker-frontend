@@ -8,26 +8,58 @@ import {
   CircularProgress,
   Typography,
   useTheme,
+  IconButton,
 } from "@mui/material";
 import { CloudUpload as CloudUploadIcon } from "@mui/icons-material";
-import { addCategory } from "@/services/user";
+import * as Icons from "@mui/icons-material";
+import { addCategory, updateCategory, updateCategoryIcon } from "@/services/user";
+import CustomColorPicker from "@/components/common/CustomColorPicker";
 
-const AddCategoryForm = ({ onSuccess, onCancel }) => {
+const THEME_COLORS = [
+  "#14a248", // Primary Green
+  "#3b82f6", // Blue
+  "#F59E0B", // Orange
+  "#EF4444", // Red
+  "#8B5CF6", // Purple
+  "#EC4899", // Pink
+  "#06B6D4", // Cyan
+  "#FACC15", // Yellow
+];
+
+const PRESET_ICONS = [
+  "Restaurant",
+  "ShoppingBag",
+  "DirectionsCar",
+  "LocalHospital",
+  "Home",
+  "Work",
+  "School",
+  "Flight",
+  "ElectricBolt",
+  "WaterDrop",
+  "Paid",
+  "Category",
+];
+
+const AddCategoryForm = ({ onSuccess, onCancel, category }) => {
   const theme = useTheme();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    title: "",
-    budget: "",
-    colour: "#000000",
-    icon: null,
+    title: category?.title || "",
+    budget: category?.budget || "",
+    colour: category?.colour || THEME_COLORS[0],
+    icon: category?.icon || "Category",
   });
   const [errors, setErrors] = useState({});
   const [fileName, setFileName] = useState("");
+  const [isCustomIcon, setIsCustomIcon] = useState(
+    category?.icon && (category.icon.startsWith("http") || category.icon.startsWith("/"))
+  );
 
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.title.trim()) {
+    if (!formData.title.toString().trim()) {
       newErrors.title = "Title is required";
     }
 
@@ -56,17 +88,44 @@ const AddCategoryForm = ({ onSuccess, onCancel }) => {
 
     try {
       setLoading(true);
-      const data = new FormData();
-      data.append("title", formData.title);
-      data.append("budget", formData.budget);
-      data.append("colour", formData.colour);
-      data.append("icon", formData.icon);
+      let response;
 
-      const response = await addCategory(data);
-      onSuccess?.(response.message || "Category added successfully", "success");
+      if (category) {
+        // Edit Mode
+        const updateData = {
+          title: formData.title,
+          budget: formData.budget,
+          colour: formData.colour,
+        };
+
+        // Update basic details
+        response = await updateCategory(category._id, updateData);
+
+        // Update icon if it's a file (newly uploaded)
+        if (formData.icon instanceof File) {
+          const iconFormData = new FormData();
+          iconFormData.append("icon", formData.icon);
+          response = await updateCategoryIcon(category._id, iconFormData);
+        } else if (typeof formData.icon === 'string' && formData.icon !== category.icon) {
+          // If it's a preset icon that changed, use the regular updateCategory for it
+          response = await updateCategory(category._id, { ...updateData, icon: formData.icon });
+        }
+
+        onSuccess?.(response.message || "Category updated successfully", "success", response.category || response.data);
+      } else {
+        // Add Mode
+        const data = new FormData();
+        data.append("title", formData.title);
+        data.append("budget", formData.budget);
+        data.append("colour", formData.colour);
+        data.append("icon", formData.icon);
+
+        response = await addCategory(data);
+        onSuccess?.(response.message || "Category added successfully", "success");
+      }
     } catch (error) {
-      console.error("Failed to add category:", error);
-      onSuccess?.(error.response?.data?.message || "Failed to add category", "error");
+      console.error("Failed to process category:", error);
+      onSuccess?.(error.response?.data?.message || `Failed to ${category ? "update" : "add"} category`, "error");
     } finally {
       setLoading(false);
     }
@@ -96,7 +155,6 @@ const AddCategoryForm = ({ onSuccess, onCancel }) => {
         <Box>
           <Typography variant="subtitle2" sx={{ mb: 1 }}>Title</Typography>
           <TextField
-            // label="Title"
             fullWidth
             value={formData.title}
             onChange={(e) => handleChange("title", e.target.value)}
@@ -104,13 +162,17 @@ const AddCategoryForm = ({ onSuccess, onCancel }) => {
             helperText={errors.title}
             disabled={loading}
             placeholder="e.g., Food & Dining"
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 7,
+              }
+            }}
           />
         </Box>
 
         <Box>
           <Typography variant="subtitle2" sx={{ mb: 1 }}>Budget</Typography>
           <TextField
-            // label="Budget"
             fullWidth
             type="number"
             value={formData.budget}
@@ -122,54 +184,118 @@ const AddCategoryForm = ({ onSuccess, onCancel }) => {
             inputProps={{
               min: 0,
             }}
-          />
-        </Box>
-
-        <Box>
-          <Typography variant="subtitle2" sx={{ mb: 1 }}>
-            Colour
-          </Typography>
-          <TextField
-            fullWidth
-            type="color"
-            value={formData.colour}
-            onChange={(e) => handleChange("colour", e.target.value)}
-            error={!!errors.colour}
-            helperText={errors.colour}
-            disabled={loading}
             sx={{
-              "& input": {
-                height: 50,
-                padding: 0,
-                cursor: "pointer",
-              },
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 7,
+              }
             }}
           />
         </Box>
 
         <Box>
-          <Button
-            component="label"
-            variant="outlined"
-            startIcon={<CloudUploadIcon />}
-            fullWidth
+          <Typography variant="subtitle2" sx={{ mb: 1.5 }}>
+            Select Color
+          </Typography>
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mb: 2 }}>
+            {THEME_COLORS.map((color) => (
+              <Box
+                key={color}
+                onClick={() => handleChange("colour", color)}
+                sx={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  bgcolor: color,
+                  cursor: "pointer",
+                  border: formData.colour === color ? `3px solid ${theme.palette.text.primary}` : "none",
+                  boxShadow: formData.colour === color ? `0 0 0 2px ${color}` : "none",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    transform: "scale(1.1)",
+                  },
+                }}
+              />
+            ))}
+          </Box>
+          <CustomColorPicker
+            value={formData.colour}
+            onChange={(newColor) => handleChange("colour", newColor)}
             disabled={loading}
-            sx={{ 
-              height: 56,
-              borderColor: errors.icon ? theme.palette.error.main : 'inherit',
-              color: errors.icon ? theme.palette.error.main : 'inherit'
-            }}
-          >
-            {fileName || "Upload Icon"}
-            <input
-              type="file"
-              hidden
-              accept="image/*"
-              onChange={handleFileChange}
-            />
-          </Button>
+          />
+          {errors.colour && (
+            <Typography variant="caption" color="error" sx={{ mt: 1, display: "block" }}>
+              {errors.colour}
+            </Typography>
+          )}
+        </Box>
+
+        <Box>
+          <Typography variant="subtitle2" sx={{ mb: 1.5 }}>
+            Select Icon
+          </Typography>
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mb: 2 }}>
+            {PRESET_ICONS.map((iconName) => {
+              const IconComp = Icons[iconName] || Icons.Category;
+              const isSelected = !isCustomIcon && formData.icon === iconName;
+              return (
+                <IconButton
+                  key={iconName}
+                  onClick={() => {
+                    handleChange("icon", iconName);
+                    setIsCustomIcon(false);
+                    setFileName("");
+                  }}
+                  sx={{
+                    bgcolor: isSelected ? theme.palette.primary.main : "transparent",
+                    color: theme.palette.text.primary,
+                    border: isSelected ? "none" : `1px solid ${theme.palette.primary.brightText}`,
+                    "&:hover": {
+                      border: isSelected ? "none" : `1px solid ${theme.palette.primary.brightText}`,
+                      bgcolor: isSelected ? theme.palette.primary.light : theme.palette.action.hover,
+                    },
+                  }}
+                >
+                  <IconComp sx={{ fontSize: 20 }} />
+                </IconButton>
+              );
+            })}
+          </Box>
+
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Button
+              component="label"
+              variant="outlined"
+              size="small"
+              startIcon={<CloudUploadIcon />}
+              disabled={loading}
+              sx={{
+                borderColor: isCustomIcon ? theme.palette.primary.main : theme.palette.divider,
+                bgcolor: isCustomIcon ? theme.palette.primary.main : "transparent",
+                "&:hover": {
+                  bgcolor: isCustomIcon ? theme.palette.primary.light : theme.palette.action.hover,
+                },
+              }}
+            >
+              {fileName ? "Change Custom" : "Upload Custom"}
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={(e) => {
+                  handleFileChange(e);
+                  setIsCustomIcon(true);
+                }}
+              />
+            </Button>
+            {fileName && (
+              <Typography variant="caption" sx={{ color: theme.palette.text.secondary, maxWidth: 150, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {fileName}
+              </Typography>
+            )}
+          </Box>
+
           {errors.icon && (
-            <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+            <Typography variant="caption" color="error" sx={{ mt: 1, display: "block" }}>
               {errors.icon}
             </Typography>
           )}
@@ -191,7 +317,7 @@ const AddCategoryForm = ({ onSuccess, onCancel }) => {
           disabled={loading}
           sx={{ minWidth: 100 }}
         >
-          {loading ? <CircularProgress size={24} /> : "Submit"}
+          {loading ? <CircularProgress size={24} /> : category ? "Save Changes" : "Submit"}
         </Button>
       </Box>
     </form>

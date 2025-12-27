@@ -26,7 +26,7 @@ const CustomDatePicker = ({
                     fullWidth: fullWidth,
                     required: required,
                     error: error,
-                    helperText: helperText,
+                    // helperText: helperText,
                     ...props, // Pass other props to TextField
                     sx: {
                         "& .MuiOutlinedInput-root": {

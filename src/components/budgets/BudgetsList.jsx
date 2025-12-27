@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Loading from "@/components/common/Loading";
 import { Box, Typography, Button, LinearProgress, Avatar, useTheme, Paper } from "@mui/material";
 import { Add as AddIcon, ChevronRight as ChevronRightIcon } from "@mui/icons-material";
 import { formatCurrency } from "@/utils/formatUtils";
@@ -20,7 +21,7 @@ const BudgetsList = ({ categories, isLoading, onSelectCategory, selectedCategory
     }
   };
 
-  if (isLoading) return <Typography>Loading...</Typography>;
+  if (isLoading) return <Loading height="400px" sx={{ maxWidth: 400 }} />;
 
   return (
     <Box sx={{ width: "100%", maxWidth: 400, display: "flex", flexDirection: "column", height: "100%" }}>
@@ -34,7 +35,7 @@ const BudgetsList = ({ categories, isLoading, onSelectCategory, selectedCategory
           const isOverBudget = percentage > 75;
           const statusText = isOverBudget ? "In review" : "On track";
           const isSelected = selectedCategoryId === (category._id || category.categoryName);
-          
+
           return (
             <Paper
               key={category._id || category.categoryName}
@@ -61,9 +62,9 @@ const BudgetsList = ({ categories, isLoading, onSelectCategory, selectedCategory
                     }}
                   >
                     {category.icon && (category.icon.startsWith("http") || category.icon.startsWith("/")) ? (
-                        <img src={category.icon} alt={category.categoryName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img src={category.icon} alt={category.categoryName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
-                        getIcon(category.icon)
+                      getIcon(category.icon)
                     )}
                   </Avatar>
                   <Box>
@@ -138,7 +139,7 @@ const BudgetsList = ({ categories, isLoading, onSelectCategory, selectedCategory
         onClose={() => setDialogOpen(false)}
         onSuccess={handleDialogSuccess}
       />
-      
+
       <NotificationComponent />
     </Box>
   );

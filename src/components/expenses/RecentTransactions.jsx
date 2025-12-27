@@ -7,6 +7,7 @@ import { getAllTransactions } from "@/services/transactions";
 import { formatCurrency } from "@/utils/formatUtils";
 import { formatRelativeDate } from "@/utils/dateUtils";
 import * as Icons from "@mui/icons-material";
+import Loading from "@/components/common/Loading";
 
 const RecentTransactions = ({ selectedDate }) => {
   const theme = useTheme();
@@ -19,7 +20,7 @@ const RecentTransactions = ({ selectedDate }) => {
       try {
         const response = await getAllTransactions();
         const allTransactions = response.data || [];
-        
+
         // Filter by selected month and year
         const filtered = allTransactions.filter(transaction => {
           const transactionDate = new Date(transaction.date);
@@ -28,10 +29,10 @@ const RecentTransactions = ({ selectedDate }) => {
             transactionDate.getFullYear() === selectedDate.getFullYear()
           );
         });
-        
+
         // Sort by date descending
         const sorted = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-        
+
         // Take recent 5
         setTransactions(sorted.slice(0, 5));
       } catch (error) {
@@ -50,11 +51,7 @@ const RecentTransactions = ({ selectedDate }) => {
   };
 
   if (isLoading) {
-    return (
-      <Box sx={{ mt: 4, p: 3, bgcolor: theme.palette.background.paper, borderRadius: 3 }}>
-        <Typography>Loading...</Typography>
-      </Box>
-    );
+    return <Loading height="300px" sx={{ mt: 4, p: 3, bgcolor: theme.palette.background.paper, borderRadius: 3 }} />;
   }
 
   return (

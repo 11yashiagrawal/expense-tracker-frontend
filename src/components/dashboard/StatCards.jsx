@@ -120,7 +120,6 @@ export default function StatCards() {
           flexDirection: "column",
           gap: 2,
           minHeight: 100,
-          // border: `1px solid ${theme.palette.divider}`,
         }}
       >
         <Typography

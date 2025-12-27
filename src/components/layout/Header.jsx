@@ -12,7 +12,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 export default function Header() {
   const theme = useTheme();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -38,12 +38,7 @@ export default function Header() {
   }, [user]);
 
   const handleLogout = async () => {
-    try {
-      await logoutUser();
-      router.push("/");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
+    await logout();
   };
 
   // Get user initials for fallback
@@ -96,9 +91,9 @@ export default function Header() {
         </Avatar>
 
         <Tooltip title="Logout">
-          <IconButton 
+          <IconButton
             onClick={handleLogout}
-            sx={{ 
+            sx={{
               color: theme.palette.text.primary,
               borderColor: "transparent",
               "&:hover": {

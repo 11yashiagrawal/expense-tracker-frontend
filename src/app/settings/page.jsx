@@ -4,35 +4,34 @@ import { useState, useEffect } from "react";
 import {
   Box,
   Typography,
-  TextField,
   Button,
-  Avatar,
-  IconButton,
-  Grid,
-  Paper,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  ListItemSecondaryAction,
-  Divider,
   CircularProgress,
   useTheme,
   Snackbar,
   Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Paper,
 } from "@mui/material";
-import { Edit as EditIcon, CameraAlt as CameraAltIcon } from "@mui/icons-material";
-import { getCurrentUser, updateAccountDetails, updateAvatar } from "@/services/user";
-import EditCategoryDialog from "@/components/settings/EditCategoryDialog";
+import Loading from "@/components/common/Loading";
+import { getCurrentUser, updateAccountDetails, updateAvatar, getAllCategories, deleteCategory } from "@/services/user";
+import AddCategoryForm from "@/components/forms/AddCategoryForm";
+
+// Sub-components
+import ProfileSection from "@/components/settings/ProfileSection";
+import AccountDetailsForm from "@/components/settings/AccountDetailsForm";
+import CategoryList from "@/components/settings/CategoryList";
+import DeleteCategoryDialog from "@/components/settings/DeleteCategoryDialog";
 
 export default function Settings() {
   const theme = useTheme();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [user, setUser] = useState(getCurrentUser());
+  const [user, setUser] = useState({});
   const [categories, setCategories] = useState([]);
 
-  
+
   // Form state
   const [formData, setFormData] = useState({
     first_name: user?.first_name || "",
@@ -43,9 +42,14 @@ export default function Settings() {
     balance: user?.balance || "",
   });
 
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+
   // Dialog state
-  const [editCategoryOpen, setEditCategoryOpen] = useState(false);
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Snackbar state
   const [snackbar, setSnackbar] = useState({
@@ -61,9 +65,11 @@ export default function Settings() {
   const fetchUserData = async () => {
     try {
       setLoading(true);
-      const userData = await getCurrentUser();
+      const res = await getCurrentUser();
+      const catres = await getAllCategories();
+      const userData = res.data;
       setUser(userData);
-      setCategories(userData.categories || []);
+      setCategories(catres.data);
       setFormData({
         first_name: userData.first_name || "",
         last_name: userData.last_name || "",
@@ -72,6 +78,8 @@ export default function Settings() {
         monthly_budget: userData.monthly_budget || "",
         balance: userData.balance || "",
       });
+      setAvatarFile(null);
+      setAvatarPreview(null);
     } catch (error) {
       console.error("Failed to fetch user data:", error);
       showSnackbar("Failed to load user data", "error");
@@ -88,32 +96,39 @@ export default function Settings() {
     }));
   };
 
-  const handleAvatarChange = async (e) => {
+  const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    try {
-      const formData = new FormData();
-      formData.append("avatar", file);
-      
-      const updatedUser = await updateAvatar(formData);
-      setUser(updatedUser);
-      showSnackbar("Avatar updated successfully", "success");
-    } catch (error) {
-      console.error("Failed to update avatar:", error);
-      showSnackbar("Failed to update avatar", "error");
-    }
+    setAvatarFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatarPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSaveDetails = async () => {
     try {
       setSaving(true);
-      const updatedUser = await updateAccountDetails(formData);
+
+      // Update basic details
+      let updatedUser = await updateAccountDetails(formData);
+
+      // Update avatar if selected
+      if (avatarFile) {
+        const avatarFormData = new FormData();
+        avatarFormData.append("avatar", avatarFile);
+        updatedUser = await updateAvatar(avatarFormData);
+        setAvatarFile(null);
+        setAvatarPreview(null);
+      }
+
       setUser(updatedUser);
-      showSnackbar("Account details updated successfully", "success");
+      showSnackbar("Settings updated successfully", "success");
     } catch (error) {
-      console.error("Failed to update account details:", error);
-      showSnackbar("Failed to update account details", "error");
+      console.error("Failed to update settings:", error);
+      showSnackbar("Failed to update settings", "error");
     } finally {
       setSaving(false);
     }
@@ -121,14 +136,50 @@ export default function Settings() {
 
   const handleEditCategory = (category) => {
     setSelectedCategory(category);
-    setEditCategoryOpen(true);
+    setCategoryDialogOpen(true);
   };
 
-  const handleCategoryUpdate = (updatedCategory) => {
-    setCategories((prev) =>
-      prev.map((cat) => (cat._id === updatedCategory._id ? updatedCategory : cat))
-    );
-    showSnackbar("Category updated successfully", "success");
+  const handleAddCategory = () => {
+    setSelectedCategory(null);
+    setCategoryDialogOpen(true);
+  };
+
+  const handleCategorySuccess = (message, severity, updatedCategory) => {
+    showSnackbar(message, severity);
+    if (severity === "success") {
+      if (selectedCategory) {
+        // Edit Mode
+        setCategories((prev) =>
+          prev.map((cat) => (cat._id === updatedCategory._id ? updatedCategory : cat))
+        );
+      } else {
+        // Add Mode
+        getAllCategories().then(res => setCategories(res.data));
+      }
+      setCategoryDialogOpen(false);
+    }
+  };
+
+  const handleConfirmDelete = (category) => {
+    setSelectedCategory(category);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteCategory = async () => {
+    if (!selectedCategory) return;
+    try {
+      setDeleting(true);
+      await deleteCategory(selectedCategory._id);
+      setCategories((prev) => prev.filter((cat) => cat._id !== selectedCategory._id));
+      setDeleteDialogOpen(false);
+      showSnackbar("Category deleted successfully", "success");
+    } catch (error) {
+      console.error("Failed to delete category:", error);
+      showSnackbar("Failed to delete category", "error");
+    } finally {
+      setDeleting(false);
+      setSelectedCategory(null);
+    }
   };
 
   const showSnackbar = (message, severity) => {
@@ -142,9 +193,7 @@ export default function Settings() {
   if (loading) {
     return (
       <ProtectedLayout>
-        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
-          <CircularProgress />
-        </Box>
+        <Loading fullScreen={false} height="400px" />
       </ProtectedLayout>
     );
   }
@@ -155,149 +204,35 @@ export default function Settings() {
         Settings
       </Typography>
       <Box sx={{ p: 3 }}>
-        <Paper sx={{ p: 4, mb: 4, borderRadius: 2, flexDirection: "column", alignItems: "center" }}>
-          <Grid container spacing={4}>
-            {/* Avatar Section (Left) */}
-            <Grid item xs={12} md={3} sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <Box sx={{ position: "relative" }}>
-                <Avatar
-                  src={user?.avatar}
-                  alt={user?.first_name}
-                  sx={{ width: 150, height: 150, mb: 2, border: `4px solid ${theme.palette.background.paper}`, boxShadow: theme.shadows[3] }}
-                />
-                <IconButton
-                  component="label"
-                  sx={{
-                    position: "absolute",
-                    bottom: 16,
-                    right: 0,
-                    backgroundColor: theme.palette.primary.main,
-                    color: "white",
-                    "&:hover": { backgroundColor: theme.palette.primary.dark },
-                  }}
-                >
-                  <CameraAltIcon fontSize="small" />
-                  <input
-                    type="file"
-                    hidden
-                    accept="image/*"
-                    onChange={handleAvatarChange}
-                  />
-                </IconButton>
-              </Box>
-              <Typography variant="h6" sx={{ mt: 2 }}>
-                {user?.first_name} {user?.last_name}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {user?.email}
-              </Typography>
-            </Grid>
+        <Paper sx={{ p: { xs: 2, md: 4 }, mb: 4, borderRadius: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", md: "row" },
+              alignItems: "center",
+              gap: 4,
+            }}
+          >
+            <ProfileSection
+              avatarPreview={avatarPreview}
+              avatarUrl={user?.avatar}
+              firstName={user?.first_name}
+              onAvatarChange={handleAvatarChange}
+            />
 
-            {/* Account Details Section (Right) */}
-            <Grid item xs={12} md={9}>
-              <Typography variant="h6" sx={{ mb: 3, fontWeight: "bold" }}>
-                Account Details
-              </Typography>
-              <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="First Name"
-                    name="first_name"
-                    value={formData.first_name}
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Last Name"
-                    name="last_name"
-                    value={formData.last_name}
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Phone Number"
-                    name="phone_no"
-                    value={formData.phone_no}
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Monthly Budget"
-                    name="monthly_budget"
-                    type="number"
-                    value={formData.monthly_budget}
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Balance"
-                    name="balance"
-                    type="number"
-                    value={formData.balance}
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Paper>
-
-        {/* Categories Section */}
-        <Paper sx={{ p: 4, mb: 4, borderRadius: 2 }}>
-          <Typography variant="h6" sx={{ mb: 3, fontWeight: "bold" }}>
-            Categories
-          </Typography>
-          <Box sx={{ maxHeight: 400, overflowY: "auto" }}>
-            <List>
-              {categories.map((category, index) => (
-                <div key={category._id}>
-                  <ListItem>
-                    <ListItemAvatar>
-                      <Avatar
-                        src={category.icon}
-                        sx={{
-                          bgcolor: category.colour,
-                          width: 40,
-                          height: 40,
-                        }}
-                      >
-                        {category.title[0]}
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={category.title}
-                      secondary={`Budget: $${category.budget}`}
-                    />
-                    <ListItemSecondaryAction>
-                      <IconButton edge="end" onClick={() => handleEditCategory(category)}>
-                        <EditIcon />
-                      </IconButton>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  {index < categories.length - 1 && <Divider variant="inset" component="li" />}
-                </div>
-              ))}
-            </List>
+            <AccountDetailsForm
+              formData={formData}
+              onInputChange={handleInputChange}
+            />
           </Box>
         </Paper>
+
+        <CategoryList
+          categories={categories}
+          onEdit={handleEditCategory}
+          onDelete={handleConfirmDelete}
+          onAdd={handleAddCategory}
+        />
 
         {/* Save Button */}
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -312,11 +247,26 @@ export default function Settings() {
         </Box>
       </Box>
 
-      <EditCategoryDialog
-        open={editCategoryOpen}
-        onClose={() => setEditCategoryOpen(false)}
-        category={selectedCategory}
-        onUpdate={handleCategoryUpdate}
+      {/* Dialogs */}
+      <Dialog open={categoryDialogOpen} onClose={() => setCategoryDialogOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle sx={{ fontWeight: "bold" }}>
+          {selectedCategory ? "Edit Category" : "Create Category"}
+        </DialogTitle>
+        <DialogContent>
+          <AddCategoryForm
+            category={selectedCategory}
+            onSuccess={handleCategorySuccess}
+            onCancel={() => setCategoryDialogOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      <DeleteCategoryDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={handleDeleteCategory}
+        categoryName={selectedCategory?.title}
+        isDeleting={deleting}
       />
 
       <Snackbar

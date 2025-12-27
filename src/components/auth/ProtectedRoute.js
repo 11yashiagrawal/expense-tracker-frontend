@@ -3,7 +3,8 @@
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { Box, CircularProgress } from "@mui/material";
+import { Box } from "@mui/material";
+import Loading from "@/components/common/Loading";
 
 // List of protected routes
 const PROTECTED_ROUTES = [
@@ -71,18 +72,7 @@ export default function ProtectedRoute({ children }) {
 
   // Show loading state while checking authentication
   if (isLoading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <Loading fullScreen />;
   }
 
   // Don't render children if not authenticated

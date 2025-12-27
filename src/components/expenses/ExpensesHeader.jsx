@@ -72,9 +72,8 @@ const ExpensesHeader = ({ selectedDate, onDateChange }) => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          mb: 4,
-          p: 3,
-          borderRadius: 2,
+          mb: 2,
+          p: 2,
         }}
       >
         <Box>

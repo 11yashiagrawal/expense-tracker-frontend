@@ -56,7 +56,7 @@ export const updateAvatar = async (formData) => {
 
 export const updateCategory = async (id, data) => {
   try {
-    const res = await api.patch(`${API_URLS.CATEGORIES.UPDATE_CATEGORY}?id=${id}`, data);
+    const res = await api.patch(`${API_URLS.CATEGORIES.UPDATE_CATEGORY}${id}`, data);
     return res.data;
   } catch (error) {
     console.log(error);
@@ -69,10 +69,21 @@ export const updateCategoryIcon = async (id, formData) => {
     const config = {
       headers: { "Content-Type": "multipart/form-data" },
     };
-    const res = await api.patch(`${API_URLS.CATEGORIES.UPDATE_CATEGORY_ICON}?id=${id}`, formData, config);
+    const res = await api.patch(`${API_URLS.CATEGORIES.UPDATE_CATEGORY_ICON}${id}`, formData, config);
     return res.data;
   } catch (error) {
     console.log(error);
     throw error;
   }
 };
+
+export const deleteCategory = async (id) => {
+  try {
+    const res = await api.delete(`${API_URLS.CATEGORIES.DELETE_CATEGORY}${id}`);
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+

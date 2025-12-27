@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Avatar, useTheme } from "@mui/material";
 import { getAllTransactions } from "@/services/transactions";
 import * as Icons from "@mui/icons-material";
+import Loading from "@/components/common/Loading";
 
 import { formatDisplayDate } from "@/utils/dateUtils";
 
@@ -18,10 +19,10 @@ const TransactionHistory = () => {
         const response = await getAllTransactions();
         // API response structure: { data: [...] }
         const allTransactions = response.data || [];
-        
+
         // Sort by date descending
         const sorted = allTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-        
+
         // Take recent 5
         setTransactions(sorted.slice(0, 5));
       } catch (error) {
@@ -49,16 +50,16 @@ const TransactionHistory = () => {
     return <IconComponent sx={{ color: "#fff", fontSize: 20 }} />;
   };
 
-  if (isLoading) return <Typography>Loading...</Typography>;
+  if (isLoading) return <Loading height="300px" />;
 
   return (
     <Box sx={{ mt: 4, width: '100%', maxWidth: '100%' }}>
       <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, color: theme.palette.text.primary }}>
         Transaction History
       </Typography>
-      
-      <TableContainer component={Paper} sx={{ 
-        backgroundColor: 'transparent', 
+
+      <TableContainer component={Paper} sx={{
+        backgroundColor: 'transparent',
         backgroundImage: 'none',
         boxShadow: 'none',
         '& .MuiTableCell-root': {
@@ -68,10 +69,10 @@ const TransactionHistory = () => {
       }}>
         <Table sx={{ borderCollapse: 'separate', borderSpacing: '0 10px' }}>
           <TableHead>
-            <TableRow sx={{ 
-              backgroundColor: '#000000', 
-              '& th': { 
-                color: '#888', 
+            <TableRow sx={{
+              backgroundColor: '#000000',
+              '& th': {
+                color: '#888',
                 fontWeight: 500,
                 fontSize: '0.9rem',
                 py: 2,
@@ -89,9 +90,9 @@ const TransactionHistory = () => {
           </TableHead>
           <TableBody>
             {transactions.map((transaction, index) => (
-              <TableRow key={transaction._id || index} sx={{ 
+              <TableRow key={transaction._id || index} sx={{
                 backgroundColor: '#0a0a0a',
-                '& td': { 
+                '& td': {
                   py: 1.5, // Reduced padding for half height
                   border: 'none'
                 },
@@ -100,9 +101,9 @@ const TransactionHistory = () => {
               }}>
                 <TableCell>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Avatar sx={{ 
+                    <Avatar sx={{
                       bgcolor: transaction.category_colour || theme.palette.primary.main,
-                      width: 30, 
+                      width: 30,
                       height: 30
                     }}>
                       {getIcon(transaction.category_icon)}

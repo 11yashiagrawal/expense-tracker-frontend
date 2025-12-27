@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Box, Paper, Typography, CircularProgress, useTheme } from "@mui/material";
+import { Box, Paper, Typography, useTheme } from "@mui/material";
+import Loading from "@/components/common/Loading";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -185,11 +186,7 @@ const SpendingAnalysis = ({ category }) => {
     };
 
     if (loading) {
-        return (
-            <Box sx={{ display: "flex", justifyContent: "center", p: 5 }}>
-                <CircularProgress size={30} sx={{ color: theme.palette.text.secondary }} />
-            </Box>
-        );
+        return <Loading height="250px" sx={{ p: 5 }} />;
     }
 
     if (!chartData) return null;

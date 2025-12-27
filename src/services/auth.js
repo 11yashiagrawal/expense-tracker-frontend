@@ -33,7 +33,8 @@ export const signupUser = async (data) => {
 
 export const logoutUser = async () => {
   try{
-    await api.post(API_URLS.AUTH.LOGOUT);
+    const res = await api.post(API_URLS.AUTH.LOGOUT);
+    console.log(res);
     return res.data;
   }catch(error){
     console.log(error);

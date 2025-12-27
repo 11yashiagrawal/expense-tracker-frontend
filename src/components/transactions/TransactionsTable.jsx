@@ -96,7 +96,7 @@ const TransactionsTable = ({
                                     />
                                 </TableCell>
                                 <TableCell align="right" sx={{ borderBottom: `1px solid ${theme.palette.action.hover}`, gap: 1 }}>
-                                    {t.type !== "subscription" && (
+                                    {t.type !== "Subscription" && (
                                         <>
                                             <IconButton
                                                 size="small"
